@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Image</title>
+</head>
+<body>
+
+<h2>Upload Image</h2>
+
+<input type="file" id="imageFile">
+<button onclick="uploadImage()">Upload</button>
+
+<p id="msg"></p>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+const supabaseUrl = 'https://pqbkbruvsguijelwetxu.supabase.co'
+const supabaseKey = 'sb_publishable_MMZWr_yxGTJAa4avW1bfSA_OqW9Fys3'
+
+const supabase = createClient(supabaseUrl, supabaseKey)
+
+window.uploadImage = async function () {
+
+    const fileInput = document.getElementById('imageFile')
+
+    if (!fileInput.files.length) {
+        alert("Select Image")
+        return
+    }
+
+    const file = fileInput.files[0]
+
+    const fileName = Date.now() + "_" + file.name
+
+    const { error } = await supabase.storage
+        .from('images')
+        .upload(fileName, file)
+
+    if (error) {
+        document.getElementById('msg').innerText = error.message
+        return
+    }
+
+    document.getElementById('msg').innerText = "Upload Success"
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>View Images</title>
+    <style>
+        img{
+            width:200px;
+            margin:10px;
+            border:1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Uploaded Images</h2>
+
+<div id="gallery"></div>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+const supabaseUrl = 'https://pqbkbruvsguijelwetxu.supabase.co'
+const supabaseKey = 'sb_publishable_MMZWr_yxGTJAa4avW1bfSA_OqW9Fys3'
+
+const supabase = createClient(supabaseUrl, supabaseKey)
+
+async function loadImages() {
+
+    const { data, error } = await supabase.storage
+        .from('images')
+        .list('', {
+            limit: 100
+        })
+
+    if (error) {
+        console.log(error)
+        return
+    }
+
+    const gallery = document.getElementById('gallery')
+
+    data.forEach(file => {
+
+        const { data: urlData } = supabase.storage
+            .from('images')
+            .getPublicUrl(file.name)
+
+        const img = document.createElement('img')
+        img.src = urlData.publicUrl
+
+        gallery.appendChild(img)
+    })
+}
+
+loadImages()
+</script>
+
+</body>
+</html>
