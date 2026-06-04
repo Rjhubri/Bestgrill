@@ -1,14 +1,24 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Upload Image</title>
+<meta charset="UTF-8">
+<title>Login</title>
 </head>
 <body>
 
-<h2>Upload Image</h2>
+<h2>Signup</h2>
 
-<input type="file" id="file">
-<button onclick="uploadImage()">Upload</button>
+<input type="email" id="semail" placeholder="Email"><br><br>
+<input type="password" id="spass" placeholder="Password"><br><br>
+<button onclick="signup()">Signup</button>
+
+<hr>
+
+<h2>Login</h2>
+
+<input type="email" id="lemail" placeholder="Email"><br><br>
+<input type="password" id="lpass" placeholder="Password"><br><br>
+<button onclick="login()">Login</button>
 
 <p id="msg"></p>
 
@@ -16,30 +26,40 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
 const supabase = createClient(
-    'https://pqbkbruvsguijelwetxu.supabase.co',
-    'sb_publishable_MMZWr_yxGTJAa4avW1bfSA_OqW9Fys3'
-);
+'https://zjmtlbngrnlwgvdaxwnh.supabase.co',
+'sb_publishable_WqodO_xHfOSMTRpJdZ73ZA_qnG9_O3z'
+)
 
-window.uploadImage = async () => {
+window.signup = async () => {
 
-    const file = document.getElementById('file').files[0];
+const email = document.getElementById('semail').value
+const password = document.getElementById('spass').value
 
-    if (!file) {
-        alert("Image select karo");
-        return;
-    }
+const { error } = await supabase.auth.signUp({
+email,
+password
+})
 
-    const fileName = Date.now() + "_" + file.name;
+document.getElementById('msg').innerText =
+error ? error.message : 'Signup Success'
+}
 
-    const { error } = await supabase.storage
-        .from('image')
-        .upload(fileName, file);
+window.login = async () => {
 
-    if (error) {
-        document.getElementById("msg").innerText = error.message;
-    } else {
-        document.getElementById("msg").innerText = "Upload Success";
-    }
+const email = document.getElementById('lemail').value
+const password = document.getElementById('lpass').value
+
+const { error } = await supabase.auth.signInWithPassword({
+email,
+password
+})
+
+if(error){
+document.getElementById('msg').innerText = error.message
+return
+}
+
+location.href='page2.html'
 }
 </script>
 
