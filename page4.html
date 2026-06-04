@@ -1,1 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>My Images</title>
+<style>
+img{
+width:250px;
+margin:10px;
+border:1px solid #000;
+}
+</style>
+</head>
+<body>
 
+<h2>My Images</h2>
+
+<div id="gallery"></div>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+const supabase = createClient(
+'https://zjmtlbngrnlwgvdaxwnh.supabase.co',
+'sb_publishable_WqodO_xHfOSMTRpJdZ73ZA_qnG9_O3z'
+)
+
+const { data:{user} } = await supabase.auth.getUser()
+
+if(!user){
+location.href='page1.html'
+}
+
+const { data,error } = await supabase.storage
+.from('images')
+.list(user.id)
+
+if(error){
+console.log(error)
+}
+
+for(const file of data){
+
+const path = user.id + "/" + file.name
+
+const { data:urlData } =
+await supabase.storage
+.from('images')
+.createSignedUrl(path,3600)
+
+const img=document.createElement('img')
+img.src=urlData.signedUrl
+
+document.getElementById('gallery')
+.appendChild(img)
+}
+</script>
+
+</body>
+</html>
