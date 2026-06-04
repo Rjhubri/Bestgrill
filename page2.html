@@ -1,50 +1,39 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>View Images</title>
+<meta charset="UTF-8">
+<title>Dashboard</title>
 </head>
 <body>
 
-<h2>Uploaded Images</h2>
+<h1>User Dashboard</h1>
 
-<div id="gallery"></div>
+<a href="page3.html">Upload Image</a>
+<br><br>
+
+<a href="page4.html">My Images</a>
+<br><br>
+
+<button onclick="logout()">Logout</button>
 
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
 const supabase = createClient(
-    'https://pqbkbruvsguijelwetxu.supabase.co',
-    'sb_publishable_MMZWr_yxGTJAa4avW1bfSA_OqW9Fys3'
-);
+'https://zjmtlbngrnlwgvdaxwnh.supabase.co',
+'sb_publishable_WqodO_xHfOSMTRpJdZ73ZA_qnG9_O3z'
+)
 
-async function loadImages() {
+const { data:{user} } = await supabase.auth.getUser()
 
-    const { data, error } = await supabase.storage
-        .from('image')
-        .list();
-
-    if (error) {
-        console.log(error);
-        return;
-    }
-
-    const gallery = document.getElementById('gallery');
-
-    data.forEach(file => {
-
-        const imageUrl =
-            'https://pqbkbruvsguijelwetxu.supabase.co/storage/v1/object/public/image/'
-            + file.name;
-
-        gallery.innerHTML += `
-            <img src="${imageUrl}"
-                 width="250"
-                 style="margin:10px;border:1px solid #000;">
-        `;
-    });
+if(!user){
+location.href='page1.html'
 }
 
-loadImages();
+window.logout = async()=>{
+await supabase.auth.signOut()
+location.href='page1.html'
+}
 </script>
 
 </body>
