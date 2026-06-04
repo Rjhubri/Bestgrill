@@ -2,13 +2,6 @@
 <html>
 <head>
     <title>View Images</title>
-    <style>
-        img{
-            width:200px;
-            margin:10px;
-            border:1px solid #ccc;
-        }
-    </style>
 </head>
 <body>
 
@@ -19,40 +12,39 @@
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-const supabaseUrl = 'https://pqbkbruvsguijelwetxu.supabase.co'
-const supabaseKey = 'sb_publishable_MMZWr_yxGTJAa4avW1bfSA_OqW9Fys3'
-
-const supabase = createClient(supabaseUrl, supabaseKey)
+const supabase = createClient(
+    'https://pqbkbruvsguijelwetxu.supabase.co',
+    'sb_publishable_MMZWr_yxGTJAa4avW1bfSA_OqW9Fys3'
+);
 
 async function loadImages() {
 
     const { data, error } = await supabase.storage
-        .from('images')
-        .list('', {
-            limit: 100
-        })
+        .from('image')
+        .list();
 
     if (error) {
-        console.log(error)
-        return
+        console.log(error);
+        return;
     }
 
-    const gallery = document.getElementById('gallery')
+    const gallery = document.getElementById('gallery');
 
     data.forEach(file => {
 
-        const { data: urlData } = supabase.storage
-            .from('images')
-            .getPublicUrl(file.name)
+        const imageUrl =
+            'https://pqbkbruvsguijelwetxu.supabase.co/storage/v1/object/public/images/'
+            + file.name;
 
-        const img = document.createElement('img')
-        img.src = urlData.publicUrl
-
-        gallery.appendChild(img)
-    })
+        gallery.innerHTML += `
+            <img src="${imageUrl}"
+                 width="250"
+                 style="margin:10px;border:1px solid #000;">
+        `;
+    });
 }
 
-loadImages()
+loadImages();
 </script>
 
 </body>
