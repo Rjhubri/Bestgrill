@@ -7,7 +7,7 @@
 
 <h2>Upload Image</h2>
 
-<input type="file" id="imageFile">
+<input type="file" id="file">
 <button onclick="uploadImage()">Upload</button>
 
 <p id="msg"></p>
@@ -15,34 +15,31 @@
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-const supabaseUrl = 'https://pqbkbruvsguijelwetxu.supabase.co'
-const supabaseKey = 'sb_publishable_MMZWr_yxGTJAa4avW1bfSA_OqW9Fys3'
+const supabase = createClient(
+    'https://pqbkbruvsguijelwetxu.supabase.co',
+    'sb_publishable_MMZWr_yxGTJAa4avW1bfSA_OqW9Fys3'
+);
 
-const supabase = createClient(supabaseUrl, supabaseKey)
+window.uploadImage = async () => {
 
-window.uploadImage = async function () {
+    const file = document.getElementById('file').files[0];
 
-    const fileInput = document.getElementById('imageFile')
-
-    if (!fileInput.files.length) {
-        alert("Select Image")
-        return
+    if (!file) {
+        alert("Image select karo");
+        return;
     }
 
-    const file = fileInput.files[0]
-
-    const fileName = Date.now() + "_" + file.name
+    const fileName = Date.now() + "_" + file.name;
 
     const { error } = await supabase.storage
-        .from('images')
-        .upload(fileName, file)
+        .from('image')
+        .upload(fileName, file);
 
     if (error) {
-        document.getElementById('msg').innerText = error.message
-        return
+        document.getElementById("msg").innerText = error.message;
+    } else {
+        document.getElementById("msg").innerText = "Upload Success";
     }
-
-    document.getElementById('msg').innerText = "Upload Success"
 }
 </script>
 
