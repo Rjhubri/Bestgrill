@@ -3,18 +3,66 @@
 <head>
 <meta charset="UTF-8">
 <title>Dashboard</title>
+
+<style>
+body{
+font-family:Arial,sans-serif;
+background:#f5f5f5;
+padding:20px;
+}
+
+.box{
+max-width:700px;
+margin:auto;
+background:white;
+padding:20px;
+border-radius:10px;
+box-shadow:0 0 10px rgba(0,0,0,.1);
+}
+
+.url{
+background:#eee;
+padding:10px;
+margin:10px 0;
+word-break:break-all;
+border-radius:5px;
+}
+
+button,a{
+padding:10px 15px;
+margin:5px;
+cursor:pointer;
+text-decoration:none;
+display:inline-block;
+}
+</style>
+
 </head>
 <body>
 
-<h1>User Dashboard</h1>
+<div class="box">
 
-<a href="page3.html">Upload Image</a>
+<h1 id="welcome">Loading...</h1>
+
+<h3>My Public Profile Link</h3>
+
+<div class="url" id="profileLink"></div>
+
+<button onclick="copyLink()">Copy Link</button>
+
+<hr>
+
+<a href="page3.html">📤 Upload Image</a>
+
 <br><br>
 
-<a href="page4.html">My Images</a>
+<a href="page4.html">🖼️ My Images</a>
+
 <br><br>
 
 <button onclick="logout()">Logout</button>
+
+</div>
 
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
@@ -30,7 +78,29 @@ if(!user){
 location.href='page1.html'
 }
 
-window.logout = async()=>{
+const { data:profile } = await supabase
+.from('profiles')
+.select('*')
+.eq('id',user.id)
+.single()
+
+document.getElementById("welcome").innerText =
+"Welcome " + (profile?.name || "User")
+
+const profileUrl =
+location.origin +
+location.pathname.replace("page2.html","page5.html") +
+"?user=" + user.id
+
+document.getElementById("profileLink").innerText =
+profileUrl
+
+window.copyLink = async ()=>{
+await navigator.clipboard.writeText(profileUrl)
+alert("Profile link copied")
+}
+
+window.logout = async ()=>{
 await supabase.auth.signOut()
 location.href='page1.html'
 }
