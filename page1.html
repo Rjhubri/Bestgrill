@@ -2,25 +2,115 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Login</title>
+<title>Login / Signup</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:#f0f2f5;
+}
+
+.box{
+width:350px;
+background:#fff;
+padding:25px;
+border-radius:12px;
+box-shadow:0 0 15px rgba(0,0,0,.15);
+}
+
+h2{
+text-align:center;
+margin-bottom:15px;
+}
+
+input{
+width:100%;
+padding:10px;
+margin-bottom:10px;
+border:1px solid #ccc;
+border-radius:6px;
+}
+
+button{
+width:100%;
+padding:10px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+margin-top:5px;
+}
+
+.signup{
+background:#28a745;
+color:white;
+}
+
+.login{
+background:#007bff;
+color:white;
+}
+
+.switch{
+text-align:center;
+margin-top:10px;
+cursor:pointer;
+color:#007bff;
+}
+
+#msg{
+margin-top:10px;
+text-align:center;
+}
+</style>
 </head>
 <body>
 
+<div class="box">
+
+<div id="signupBox">
+
 <h2>Signup</h2>
 
-<input type="email" id="semail" placeholder="Email"><br><br>
-<input type="password" id="spass" placeholder="Password"><br><br>
-<button onclick="signup()">Signup</button>
+<input type="text" id="name" placeholder="Full Name">
+<input type="email" id="semail" placeholder="Email">
+<input type="password" id="spass" placeholder="Password">
 
-<hr>
+<button class="signup" onclick="signup()">Signup</button>
+
+<div class="switch" onclick="showLogin()">
+Already have an account? Login
+</div>
+
+</div>
+
+<div id="loginBox" style="display:none;">
 
 <h2>Login</h2>
 
-<input type="email" id="lemail" placeholder="Email"><br><br>
-<input type="password" id="lpass" placeholder="Password"><br><br>
-<button onclick="login()">Login</button>
+<input type="email" id="lemail" placeholder="Email">
+<input type="password" id="lpass" placeholder="Password">
+
+<button class="login" onclick="login()">Login</button>
+
+<div class="switch" onclick="showSignup()">
+Create New Account
+</div>
+
+</div>
 
 <p id="msg"></p>
+
+</div>
 
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
@@ -30,36 +120,67 @@ const supabase = createClient(
 'sb_publishable_WqodO_xHfOSMTRpJdZ73ZA_qnG9_O3z'
 )
 
-window.signup = async () => {
-
-const email = document.getElementById('semail').value
-const password = document.getElementById('spass').value
-
-const { error } = await supabase.auth.signUp({
-email,
-password
-})
-
-document.getElementById('msg').innerText =
-error ? error.message : 'Signup Success'
+window.showLogin = ()=>{
+document.getElementById("signupBox").style.display="none";
+document.getElementById("loginBox").style.display="block";
 }
 
-window.login = async () => {
+window.showSignup = ()=>{
+document.getElementById("signupBox").style.display="block";
+document.getElementById("loginBox").style.display="none";
+}
 
-const email = document.getElementById('lemail').value
-const password = document.getElementById('lpass').value
+window.signup = async ()=>{
+
+const name=document.getElementById("name").value;
+const email=document.getElementById("semail").value;
+const password=document.getElementById("spass").value;
+
+const { data, error } = await supabase.auth.signUp({
+email,
+password
+});
+
+if(error){
+document.getElementById("msg").innerText=error.message;
+return;
+}
+
+const user = data.user;
+
+if(user){
+
+await supabase
+.from("profiles")
+.insert([
+{
+id:user.id,
+name:name,
+image_url:"https://picsum.photos/200"
+}
+]);
+
+}
+
+document.getElementById("msg").innerText="Signup Success";
+}
+
+window.login = async ()=>{
+
+const email=document.getElementById("lemail").value;
+const password=document.getElementById("lpass").value;
 
 const { error } = await supabase.auth.signInWithPassword({
 email,
 password
-})
+});
 
 if(error){
-document.getElementById('msg').innerText = error.message
-return
+document.getElementById("msg").innerText=error.message;
+return;
 }
 
-location.href='page2.html'
+location.href="page2.html";
 }
 </script>
 
